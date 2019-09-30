@@ -3,12 +3,16 @@ package com.homework.homework.service.impl;
 import com.homework.homework.model.Book;
 import com.homework.homework.model.IndustryIdentifier;
 import com.homework.homework.model.JsonFile;
+import com.homework.homework.model.Rating;
 import com.homework.homework.service.ApiService;
 import com.homework.homework.utils.JsonParser;
+import com.homework.homework.utils.Utils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiServiceImpl implements ApiService {
@@ -22,7 +26,9 @@ public class ApiServiceImpl implements ApiService {
             book.setTitle(item.getVolumeInfo().getTitle());
             book.setSubtitle(item.getVolumeInfo().getSubtitle());
             book.setPublisher(item.getVolumeInfo().getPublisher());
-            book.setPublishedData(item.getVolumeInfo().getPublishedData());
+            if (item.getVolumeInfo().getPublishedDate() != null) {
+                book.setPublishedDate(Utils.convertDateStringToUnixTimeStamp(item.getVolumeInfo().getPublishedDate()));
+            }
             book.setDescription(item.getVolumeInfo().getDescription());
             book.setPageCount(item.getVolumeInfo().getPageCount());
             book.setThumbnailUrl(item.getVolumeInfo().getImageLinks().getThumbnail());
@@ -37,13 +43,41 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @PostConstruct
     public List<Book> getAllBooks() {
-
         return mapper(JsonParser.parseJson("misc/books.json"));
     }
 
     @Override
     public Book getSpecifiedBookByISBN(String id) {
-        return getAllBooks().parallelStream().filter(specifiedBook -> id.equals(specifiedBook.getIsbn())).findAny().orElse(null);
+        return getAllBooks().parallelStream().filter(book -> book != null).filter(specifiedBook -> id.equals(specifiedBook.getIsbn())).findAny().orElse(new Book());
     }
+
+    @Override
+    public List<Book> getBooksByCategory(String category) {
+        return getAllBooks().parallelStream().filter(book -> book != null).filter(book -> book.getCategories() != null)
+                .filter(book -> book.getCategories().contains(category)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Book> getBooks(String query) {
+        return getAllBooks().parallelStream().filter(book -> book != null).filter(book -> book.getTitle().contains(query) || book.getSubtitle().contains(query)
+                || book.getDescription().contains(query)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Rating> getRatings() {
+        List<String> authors = new ArrayList<>();
+        List<Rating> ratings = new ArrayList<>();
+        getAllBooks().parallelStream().filter(book -> book != null).filter(book -> book.getAuthors() != null).forEach(book -> authors.addAll(book.getAuthors()));
+        authors.parallelStream().filter(v -> v != null).distinct().forEach(author -> {
+            System.out.println(author);
+            OptionalDouble averageOptional = getAllBooks().parallelStream().filter(book -> book != null).filter(book -> book.getAuthors() != null)
+                    .filter(book -> book.getAuthors().contains(author)).mapToDouble(t -> t.getAverageRating()).average();
+            ratings.add(new Rating(author, averageOptional.getAsDouble()));
+        });
+        return ratings;
+    }
+
+
 }
