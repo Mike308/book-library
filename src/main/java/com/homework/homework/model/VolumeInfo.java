@@ -12,7 +12,7 @@ public class VolumeInfo {
     private String title;
     private String subtitle;
     private String publisher;
-    private long publishedData;
+    private String publishedDate;
     private String description;
     private int pageCount;
     private ImageLink imageLinks;
