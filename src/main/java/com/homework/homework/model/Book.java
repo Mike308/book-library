@@ -14,7 +14,7 @@ public class Book {
     private String title;
     private String subtitle;
     private String publisher;
-    private long publishedData;
+    private long  publishedDate;
     private String description;
     private int pageCount;
     private String thumbnailUrl;
