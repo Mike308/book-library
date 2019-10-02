@@ -75,10 +75,6 @@ public class BookServiceImpl implements BookService {
         return downloadLinks;
     }
 
-    private JsonFile getMappedJsonFile(String path) {
-        return JsonParser.parseJson(path);
-    }
-
     @Override
     public List<Book> getAllBooks() {
          allBooks = mapper(jsonFile);
@@ -98,10 +94,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getBooks(String query) {
-//        List<String> queryList = Arrays.asList(query.toUpperCase().split(" "));
-//        return getAllBooks().parallelStream().filter(book -> book != null).filter(book -> Arrays.asList(book.toString().toUpperCase().split(" ")).containsAll(queryList)).collect(Collectors.toList());
-        return  getAllBooks().parallelStream().filter(book -> book != null).filter(book -> Utils.customContains(book.toCustomString(), query)).collect(Collectors.toList());
-
+        return  getAllBooks().stream().filter(book -> book != null).filter(book -> Utils.customContains(book.toString(), query)).collect(Collectors.toList());
     }
 
     @Override
@@ -110,7 +103,7 @@ public class BookServiceImpl implements BookService {
         List<Rating> ratings = new ArrayList<>();
         getAllBooks().stream().filter(book -> book != null).filter(book -> book.getAuthors() != null).filter(book -> book.getAverageRating() > 0.0) //eliminating non rated books
                 .forEach(book -> authors.addAll(book.getAuthors())); //fetch and add authors to authors list
-        authors.parallelStream().filter(v -> v != null).distinct().forEach(author -> {
+        authors.stream().filter(v -> v != null).distinct().forEach(author -> {
             OptionalDouble averageOptional = getAllBooks().stream().filter(book -> book != null).filter(book -> book.getAuthors() != null)
                     .filter(book -> book.getAuthors().contains(author)).mapToDouble(t -> t.getAverageRating()).average();
             ratings.add(new Rating(author, averageOptional.getAsDouble()));
