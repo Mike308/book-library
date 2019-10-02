@@ -2,7 +2,6 @@ package com.homework.homework.controller;
 
 import com.homework.homework.model.Book;
 import com.homework.homework.model.Rating;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
