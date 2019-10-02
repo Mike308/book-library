@@ -12,4 +12,5 @@ import java.util.List;
 public class Item {
     private String id;
     private VolumeInfo volumeInfo;
+    private AccessInfo accessInfo;
 }
