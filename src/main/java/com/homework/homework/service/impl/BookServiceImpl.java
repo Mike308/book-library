@@ -3,6 +3,7 @@ package com.homework.homework.service.impl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homework.homework.model.*;
+import com.homework.homework.model.mapper.CustomMapper;
 import com.homework.homework.service.BookService;
 import com.homework.homework.utils.JsonParser;
 import com.homework.homework.utils.Utils;
@@ -17,36 +18,12 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     private JsonFile jsonFile;
-    List<Book> allBooks;
+    private List<Book> allBooks;
+    private CustomMapper customMapper = new CustomMapper();
+
 
     public BookServiceImpl() {
         jsonFile = JsonParser.parseJson("misc/books.json");
-    }
-
-    private List<Book> mapper(JsonFile jsonFile) {
-        List<Book> books = new ArrayList<>();
-        jsonFile.getItems().stream().forEach(item -> {
-            Book book = new Book();
-            book.setIsbn(item.getVolumeInfo().getIndustryIdentifiers().stream().filter(isbn -> "ISBN_13".equals(isbn.getType()))
-                    .findAny().orElse(new IndustryIdentifier("ID", item.getId())).getIdentifier());
-            book.setTitle(item.getVolumeInfo().getTitle());
-            book.setSubtitle(item.getVolumeInfo().getSubtitle());
-            book.setPublisher(item.getVolumeInfo().getPublisher());
-            if (item.getVolumeInfo().getPublishedDate() != null) {
-                book.setPublishedDate(Utils.convertDateStringToUnixTimeStamp(item.getVolumeInfo().getPublishedDate()));
-            }
-            book.setDescription(item.getVolumeInfo().getDescription());
-            book.setPageCount(item.getVolumeInfo().getPageCount());
-            book.setThumbnailUrl(item.getVolumeInfo().getImageLinks().getThumbnail());
-            book.setLanguage(item.getVolumeInfo().getLanguage());
-            book.setPreviewLink(item.getVolumeInfo().getPreviewLink());
-            book.setAverageRating(item.getVolumeInfo().getAverageRating());
-            book.setAuthors(item.getVolumeInfo().getAuthors());
-            book.setCategories(item.getVolumeInfo().getCategories());
-            book.setAccessInfo(item.getAccessInfo());
-            books.add(book);
-        });
-        return books;
     }
 
     public  JsonFile parseJson(String path) {
@@ -62,23 +39,10 @@ public class BookServiceImpl implements BookService {
         return jsonFile;
     }
 
-    private List<DownloadLink> getDownloadLinks() {
-        List<DownloadLink> downloadLinks = new ArrayList<>();
-        jsonFile.getItems().stream().forEach(item -> {
-            if (item.getAccessInfo().getEpub().isAvailable()){
-                downloadLinks.add(new DownloadLink("epub", item.getAccessInfo().getEpub().getAcsTokenLink()));
-            }
-            if (item.getAccessInfo().getPdf().isAvailable()) {
-                downloadLinks.add(new DownloadLink("pdf", item.getAccessInfo().getPdf().getAcsTokenLink()));
-            }
-        });
-        return downloadLinks;
-    }
 
     @Override
     public List<Book> getAllBooks() {
-         allBooks = mapper(jsonFile);
-         return allBooks;
+         return customMapper.mapper(jsonFile);
     }
 
     @Override
