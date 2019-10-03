@@ -31,7 +31,7 @@ public class BookControllerImpl implements BookController {
                 return "500";
             }
         }else {
-            return "404, No result found";
+            return "404, \"No results found\"";
         }
     }
 
