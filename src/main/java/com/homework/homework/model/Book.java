@@ -1,6 +1,7 @@
 package com.homework.homework.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties({"accessInfo"})
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Book {
     private String isbn;
     private String title;
