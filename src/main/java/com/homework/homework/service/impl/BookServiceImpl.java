@@ -7,6 +7,7 @@ import com.homework.homework.model.mapper.CustomMapper;
 import com.homework.homework.service.BookService;
 import com.homework.homework.utils.JsonParser;
 import com.homework.homework.utils.Utils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,11 +19,13 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     private JsonFile jsonFile;
-    private List<Book> allBooks;
     private CustomMapper customMapper = new CustomMapper();
+    @Value("${json.datasource}")
+    private String path;
 
 
     public BookServiceImpl() {
+        System.out.println("Path: " + path);
         jsonFile = JsonParser.parseJson("misc/books.json");
     }
 
@@ -47,11 +50,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book getSpecifiedBookByISBN(String id) {
-        return getAllBooks().stream().filter(book -> book != null).filter(specifiedBook -> id.equals(specifiedBook.getIsbn())).findAny().orElse(new Book());
+        return getAllBooks().stream().filter(book -> book != null)
+                .filter(specifiedBook -> id.equals(specifiedBook.getIsbn())).findAny().orElse(new Book());
     }
 
     @Override
     public List<Book> getBooksByCategory(String category) {
+        //**From all book
         return getAllBooks().stream().filter(book -> book != null).filter(book -> book.getCategories() != null)
                 .filter(book -> book.getCategories().contains(category)).collect(Collectors.toList());
     }
@@ -67,18 +72,22 @@ public class BookServiceImpl implements BookService {
         List<Rating> ratings = new ArrayList<>();
         getAllBooks().stream().filter(book -> book != null).filter(book -> book.getAuthors() != null).filter(book -> book.getAverageRating() > 0.0) //eliminating non rated books
                 .forEach(book -> authors.addAll(book.getAuthors())); //fetch and add authors to authors list
-        authors.stream().filter(v -> v != null).distinct().forEach(author -> {
-            OptionalDouble averageOptional = getAllBooks().stream().filter(book -> book != null).filter(book -> book.getAuthors() != null)
-                    .filter(book -> book.getAuthors().contains(author)).mapToDouble(t -> t.getAverageRating()).average();
+        authors.stream().filter(v -> v != null).distinct().forEach(author -> { //iterate through authors list and filter book belongs to author
+            OptionalDouble averageOptional = getAllBooks().stream().filter(book -> book != null)
+                    .filter(book -> book.getAuthors() != null)
+                    .filter(book -> book.getAuthors().contains(author))
+                    .mapToDouble(t -> t.getAverageRating()).average(); //mapping book to average rating and calculating average for each author
             ratings.add(new Rating(author, averageOptional.getAsDouble()));
         });
-        return ratings.stream().sorted(Comparator.comparingDouble(Rating::getAverageRating).reversed()).collect(Collectors.toList());
+        return ratings.stream().sorted(Comparator.comparingDouble(Rating::getAverageRating)
+                               .reversed()).collect(Collectors.toList()); //sorting average rate from highest to lowest
     }
 
     @Override
     public List<DownloadLink> getDownloadLinks(String isbn) {
         List<DownloadLink> downloadLinks = new ArrayList<>();
-        getAllBooks().stream().filter(item -> item != null).filter(item -> isbn.equals(item.getIsbn())).filter(item -> item.getAccessInfo() != null).forEach(item -> {
+        getAllBooks().stream().filter(item -> item != null).filter(item -> isbn.equals(item.getIsbn()))
+                     .filter(item -> item.getAccessInfo() != null).forEach(item -> { //filter all books containing access info and insert links into download links list
             if (item.getAccessInfo().getEpub().isAvailable()){
                 downloadLinks.add(new DownloadLink("epub", item.getAccessInfo().getEpub().getAcsTokenLink()));
             }
