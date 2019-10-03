@@ -33,8 +33,9 @@ public class BookServiceImpl implements BookService {
     public List<Book> getBooksByCategory(String category) {
         return allBooks.stream().filter(book -> book != null).filter(book -> book.getCategories() != null)
                 .filter(book ->
-                    book.getCategories().stream().map(cat -> cat.toUpperCase()).collect(Collectors.toList()).contains(category.toUpperCase())
-                ).collect(Collectors.toList());
+                    book.getCategories().stream().map(cat -> cat.toUpperCase()) //upper case of category name
+                            .collect(Collectors.toList())
+                            .contains(category.toUpperCase())).collect(Collectors.toList()); //filter books which contains specified category
     }
 
     @Override
