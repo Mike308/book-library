@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homework.homework.controller.BookController;
 import com.homework.homework.model.Book;
+import com.homework.homework.model.DownloadLink;
 import com.homework.homework.model.Rating;
 import com.homework.homework.service.impl.BookServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class BookControllerImpl implements BookController {
                 return "500";
             }
         }else {
-            return "404, Not result found";
+            return "404, No result found";
         }
     }
 
@@ -50,6 +51,12 @@ public class BookControllerImpl implements BookController {
     @GetMapping("/rating")
     public List<Rating> getRatings() {
         return bookService.getRatings();
+    }
+
+    @Override
+    @GetMapping("/downloadlinks")
+    public List<DownloadLink> getDownloadLinks(@RequestParam  String isbn) {
+        return bookService.getDownloadLinks(isbn);
     }
 
 
