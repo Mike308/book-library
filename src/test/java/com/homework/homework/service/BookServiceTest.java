@@ -1,6 +1,9 @@
 package com.homework.homework.service;
 
+import com.homework.homework.model.AccessInfo;
+import com.homework.homework.model.AccessType;
 import com.homework.homework.model.Book;
+import com.homework.homework.model.Rating;
 import com.homework.homework.service.impl.BookServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +25,7 @@ public class BookServiceTest {
     private BookServiceImpl apiService;
 
     @Test
-    public void countsOfBooksShouldBeGreaterThanZero() {
-        assertTrue(apiService.getAllBooks().size() > 0);
-    }
-
-    @Test
-    public void booksWithISBNEqualsTo9781592432172ShouldHavePublisherEqualsInfoStrategistcom() {
+    public void booksWithISBNEqualsTo9781592432172ShouldHasPublisherEqualsInfoStrategistcom() {
         assertEquals("InfoStrategist.com", apiService.getSpecifiedBookByISBN("9781592432172").getPublisher());
     }
 
@@ -47,7 +45,11 @@ public class BookServiceTest {
         book.setAverageRating(4.0);
         book.setAuthors(Arrays.asList("Kenneth L. Calvert", "Michael J. Donahoo"));
         book.setCategories(Arrays.asList("Computers"));
+        book.setAccessInfo( new AccessInfo(
+                new AccessType(true, "http://books.google.pl/books/download/TCP_IP_Sockets_in_Java-sample-pdf.acsm?id=lfHo7uMk7r4C&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"),
+                new AccessType(true, "http://books.google.pl/books/download/TCP_IP_Sockets_in_Java-sample-epub.acsm?id=lfHo7uMk7r4C&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api")));
         assertEquals(book, apiService.getSpecifiedBookByISBN("9780080568782"));
+
     }
 
     @Test
@@ -68,10 +70,36 @@ public class BookServiceTest {
         book.setAuthors(Arrays.asList("Roger Garside", "John A. Mariani"));
         book.setCategories(Arrays.asList("Java (Computer program language)"));
     }
+    @Test
+    public void bookContainingPhraseConcurrentComputingShouldGiveISBNEqualTo9780471721260() {
+        Book book = new Book();
+        book.setIsbn("9780471721260");
+        assertEquals(book.getIsbn(), apiService.getBooks("Concurrent computing").get(0).getIsbn());
+    }
 
     @Test
     public void countOfBooksWithCategoryEqualsToComputerShouldByGreaterThanZero() {
         assertTrue(apiService.getBooksByCategory("Computers").size() > 0);
+    }
+
+    @Test
+    public void averageRatingOfJainPravinShouldGive5(){
+        assertEquals(5.0, apiService.getRatings().stream().filter(rating -> rating != null)
+                .filter(rating -> "Jain Pravin".equals(rating.getAuthor())).mapToDouble(Rating::getAverageRating).findFirst().getAsDouble(), 0);
+    }
+
+    @Test
+    public void linkOfPdfSourceOfBookWithISBNEqualTo9781592432172ShouldGiveProperLink(){
+        assertEquals("http://books.google.pl/books/download/A_Hypervista_of_the_Java_Landscape-sample-pdf.acsm?id=7tkN1CYzn2cC&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api",
+                apiService.getDownloadLinks("9781592432172").stream().filter(downloadLink -> downloadLink != null)
+                        .filter(downloadLink -> "pdf".equals(downloadLink.getType())).findAny().orElse(null).getLink());
+    }
+
+    @Test
+    public void countOfBooksWithCategoryEqualsToJavaCaseInsensitiveShouldGive2() {
+        assertEquals(2, apiService.getBooksByCategory("java").size());
+        assertEquals(2, apiService.getBooksByCategory("Java").size());
+        assertEquals(2, apiService.getBooksByCategory("jAvA").size());
     }
 
 
