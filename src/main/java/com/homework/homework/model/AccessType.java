@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// model representing Access type (pdf or epub)
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+//model of book.json or same structured json file containing data about book
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

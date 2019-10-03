@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"accessInfo"})
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonIgnoreProperties({"accessInfo"}) //hiding this field in response
+@JsonInclude(JsonInclude.Include.NON_DEFAULT) //hiding fields which have default values eg. null, 0.0 etc.
 public class Book {
     private String isbn;
     private String title;

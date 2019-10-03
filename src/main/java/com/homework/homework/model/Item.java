@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//model of field containing item (data for book)
 
 @Data
 @AllArgsConstructor

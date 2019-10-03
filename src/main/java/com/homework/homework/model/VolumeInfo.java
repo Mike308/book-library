@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
+//model of field VolumeInfo
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// model of field contain
+// model of field containing Access Info
 
 @Data
 @AllArgsConstructor
