@@ -24,9 +24,9 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    public Book getSpecifiedBookByISBN(String id) {
+    public Book getSpecifiedBookByISBN(String isbn) {
         return allBooks.stream().filter(book -> book != null) //eliminate null book object (preventing before NullPointerException)
-                .filter(specifiedBook -> id.equals(specifiedBook.getIsbn())).findAny().orElse(new Book());
+                .filter(specifiedBook -> isbn.equals(specifiedBook.getIsbn())).findAny().orElse(new Book());
     }
 
     @Override

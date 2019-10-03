@@ -7,7 +7,7 @@ import com.homework.homework.model.Rating;
 import java.util.List;
 
 public interface BookService {
-    Book getSpecifiedBookByISBN(String id);
+    Book getSpecifiedBookByISBN(String isbn);
     List<Book> getBooksByCategory(String category);
     List<Book> getBooks(String query);
     List<Rating> getRatings();
