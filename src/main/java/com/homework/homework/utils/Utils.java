@@ -23,10 +23,10 @@ public class Utils {
     public static JsonFile parseJson(String path) {
         JsonFile jsonFile = new JsonFile();
         ObjectMapper jsonFileMapper = new ObjectMapper();
-        jsonFileMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        jsonFileMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); //preventing before raise exception of unknown property which is not present in model class
         try{
-            File file = new File(path);
-            jsonFile = jsonFileMapper.readValue(file, JsonFile.class);
+            File file = new File(path); //loading json file
+            jsonFile = jsonFileMapper.readValue(file, JsonFile.class); //de-serializing json file to object
         }catch (IOException  e) {
             e.printStackTrace();
         }
@@ -47,25 +47,25 @@ public class Utils {
     }
 
     public static  boolean customContains(String inputString, String keyword) {
-        List<String> inputStringList = Arrays.asList(inputString.toUpperCase()
-                                             .replaceAll("[^A-Za-z0-9]", " ")
-                                             .split(" ")).stream()
-                                             .map(s -> s.replaceAll("\\s+", "")).collect(Collectors.toList());
+        List<String> inputStringList = Arrays.asList(inputString.toUpperCase() //converting string to upper (made case insensitive)
+                                             .replaceAll("[^A-Za-z0-9]", " ") //replace all special char (leaving only letter and digits)
+                                             .split(" ")).stream() //tokenize string
+                                             .map(s -> s.replaceAll("\\s+", "")) //replace all spaces
+                                             .collect(Collectors.toList()); //converting to list which contain all words in input string
         List<String> keyWords = Arrays.asList(keyword.toUpperCase().replaceAll("[^A-Za-z0-9]", " ").split(" ")).stream()
                 .map(s -> s.replaceAll("\\s+", "")).collect(Collectors.toList());
         return keyWords.stream().allMatch(inputStringList::contains);
     }
 
     public static String readConfiguration() {
-        Stream<String> lines = null;
         try {
-            lines = Files.lines(Paths.get("config.txt"));
+            Stream<String> lines = Files.lines(Paths.get("config.txt"));
+            String data = lines.collect(Collectors.joining("\n"));
+            lines.close();
+            return data.trim();
         } catch (IOException e) {
-            e.printStackTrace();
+            return "books.json";
         }
-        String data = lines.collect(Collectors.joining("\n"));
-        lines.close();
-        return data.trim();
     }
 
 
