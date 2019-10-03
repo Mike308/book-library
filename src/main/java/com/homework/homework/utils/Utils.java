@@ -46,15 +46,15 @@ public class Utils {
         }
     }
 
-    public static  boolean customContains(String inputString, String keyword) {
+    public static  boolean customContains(String inputString, String phrase) {
         List<String> inputStringList = Arrays.asList(inputString.toUpperCase() //converting string to upper (made case insensitive)
                                              .replaceAll("[^A-Za-z0-9]", " ") //replace all special char (leaving only letter and digits)
                                              .split(" ")).stream() //tokenize string
                                              .map(s -> s.replaceAll("\\s+", "")) //replace all spaces
                                              .collect(Collectors.toList()); //converting to list which contain all words in input string
-        List<String> keyWords = Arrays.asList(keyword.toUpperCase().replaceAll("[^A-Za-z0-9]", " ").split(" ")).stream()
+        List<String> keyWords = Arrays.asList(phrase.toUpperCase().replaceAll("[^A-Za-z0-9]", " ").split(" ")).stream()
                 .map(s -> s.replaceAll("\\s+", "")).collect(Collectors.toList());
-        return keyWords.stream().allMatch(inputStringList::contains);
+        return keyWords.stream().allMatch(inputStringList::contains); //return true if input string contains phrase
     }
 
     public static String readConfiguration() {
@@ -64,7 +64,7 @@ public class Utils {
             lines.close();
             return data.trim();
         } catch (IOException e) {
-            return "books.json";
+            return "books.json"; //if catch  io exception return default path to json file
         }
     }
 
